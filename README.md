@@ -1,2 +1,2 @@
 # GoogleCloudMessaging
-Library for a simple usage of the GCO offered bu Google
+Library for a simple usage of the GCM offered by Google
