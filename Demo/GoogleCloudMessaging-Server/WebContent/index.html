@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="">
+<head>
+<meta charset='utf-8' />
+<title>GCM Demo Server</title>
+<script type="text/javascript"
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btn").click(function() {
+			var posting = $.post(window.location.href+"/SendMessage", {
+				senderKey : $("#senderKey").val(),
+				deviceID : $("#deviceID").val()
+			});
+			posting.done(function(data) {
+				$("#result").empty().append(data);
+			});
+		});
+	});
+</script>
+</head>
+<body>
+	<h1>Demo platform for testing Google Cloud Messaging</h1>
+	<br />
+	<input type="text" id="senderKey" placeholder="Insert the API KEY" />
+	<br />
+	<input type="text" id="deviceID" placeholder="Insert the device ID" />
+	<br />
+	<input type="button" id="btn" value="Send" />
+	<p id="result" />
+
+</body>
+</html>
