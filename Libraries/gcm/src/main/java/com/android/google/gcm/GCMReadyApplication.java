@@ -151,7 +151,12 @@ public class GCMReadyApplication extends Application {
                 String regid = GCMRegister.getRegistrationId(getApplicationContext());
                 Log.d(TAG, regid);
                 if (regid.isEmpty()) {
-                    GCMRegister.register(getApplicationContext(), BuildConfig.SENDER_ID_GCM);
+                    GCMRegister.register(getApplicationContext(), BuildConfig.SENDER_ID_GCM, new GCMRegister.OnRegisterCallback() {
+                        @Override
+                        public void onRegister(String registrationID) {
+                            GCMReadyApplication.this.onRegister(registrationID);
+                        }
+                    });
                 }
             } else {
                 Log.i(TAG, "No valid Google Play Services APK found.");
@@ -184,4 +189,9 @@ public class GCMReadyApplication extends Application {
         }
     };
 
+    /**
+     * Perform the required operations after the successiful registration of the device
+     * @param registrationID registration ID assigned from the Google Platform
+     */
+    public void onRegister(String registrationID) {}
 }

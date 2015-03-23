@@ -20,6 +20,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -76,11 +77,11 @@ public class GCMRegister {
 
     /**
      * Registers the application with GCM servers asynchronously.
-     * <p>
+     * <p/>
      * Stores the registration ID and the app versionCode in the application's
      * shared preferences.
      */
-    public static void register(final Context context, final String senderID) {
+    public static void register(@NonNull final Context context, @NonNull final String senderID, final OnRegisterCallback onRegisterCallback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -89,6 +90,9 @@ public class GCMRegister {
                     String regid = gcm.register(senderID);
                     Log.d(TAG, "Device registered, registration ID=" + regid);
                     storeRegistrationId(context, regid);
+                    if(onRegisterCallback != null) {
+                        onRegisterCallback.onRegister(regid);
+                    }
                 } catch (IOException ex) {
                     Log.d(TAG, "Error :" + ex.getMessage());
                 }
@@ -99,11 +103,11 @@ public class GCMRegister {
 
     /**
      * Unregisters the application from GCM servers asynchronously.
-     * <p>
+     * <p/>
      * Delete the stored registration ID and the app versionCode from
      * the application's shared preferences.
      */
-    public static void unregister(final Context context) {
+    public static void unregister(@NonNull final Context context, final OnUnregisterCallback onUnregisterCallback) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -112,6 +116,9 @@ public class GCMRegister {
                     gcm.unregister();
                     removeRegistrationId(context);
                     Log.d(TAG, "Device unregistered");
+                    if(onUnregisterCallback != null) {
+                        onUnregisterCallback.onUnregister();
+                    }
                 } catch (IOException ex) {
                     Log.d(TAG, "Error :" + ex.getMessage());
                 }
@@ -125,7 +132,7 @@ public class GCMRegister {
      * {@code SharedPreferences}.
      *
      * @param context application's context.
-     * @param regId registration ID
+     * @param regId   registration ID
      */
     private static void storeRegistrationId(Context context, String regId) {
         final SharedPreferences prefs = getGcmPreferences(context);
@@ -161,5 +168,29 @@ public class GCMRegister {
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException("Could not get package name: " + e); // should never happen
         }
+    }
+
+    /**
+     * Callback for the registration phase
+     */
+    public interface OnRegisterCallback {
+        /**
+         * Perform any kind of operation after the successful registration.
+         * Do not care about the permanent storing of the information, it is already performed
+         *
+         * @param registrationID registration identifier assigned from the Google Platform
+         */
+        public void onRegister(String registrationID);
+    }
+
+    /**
+     * Callback for the registration phase
+     */
+    public interface OnUnregisterCallback {
+        /**
+         * Perform any kind of operation after the successful unregistration.
+         * Do not care about the permanent storing of the information, it is already performed
+         */
+        public void onUnregister();
     }
 }
