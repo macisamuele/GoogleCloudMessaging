@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'bintray-release'
 
 android {
     compileSdkVersion 21
@@ -32,4 +33,15 @@ dependencies {
     //should be used instead of the 'com.google.android.gms:play-services:6.5.87' since it uses
     //the new version of the library and adds only the relevant code for the GCM service
     //compile 'com.google.android.gms:play-services-gcm:7.0.0'
+}
+
+publish {
+    userOrg = 'macisamuele'
+    groupId = 'it.macisamuele'
+    artifactId = 'gcm'
+    version = '0.0.1'
+    description = 'afsa'
+    website = 'https://github.com/macisamuele/GoogleCloudMessaging'
+    issueTracker = "${website}/issues"
+    repository = "${website}.git"
 }

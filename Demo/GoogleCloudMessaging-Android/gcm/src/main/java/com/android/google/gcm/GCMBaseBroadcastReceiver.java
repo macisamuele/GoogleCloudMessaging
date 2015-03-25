@@ -26,12 +26,11 @@ import android.support.v4.content.WakefulBroadcastReceiver;
  * It allows to define a correct broadcast receiver for the GCM service simply defining the name of the class
  * that extends the {@code GCMBaseBroadcastReceiver}.
  * See <a href="http://developer.android.com/google/gcm/client.html#sample-receive">Google's Implementation</a>
- * <p/>
  * Example of use:
  * <pre>{@code
  * import android.gcm.GCMBaseBroadcastReceiver;
  * public class GcmBroadcastReceiver extends GCMBaseBroadcastReceiver {
- *      @Override
+ *      &#64;Override
  *      public String getIntentServiceHandlerName() {
  *          return IntentService.class.getName();
  *      }

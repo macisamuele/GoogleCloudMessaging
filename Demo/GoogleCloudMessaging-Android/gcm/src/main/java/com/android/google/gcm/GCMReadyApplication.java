@@ -23,13 +23,10 @@ import android.util.Log;
 /**
  * An Application wrapper that perform the required operations to initialize the device with
  * the GoogleCloudMessaging infrastructure.
- * <p/>
  * It automatically checks the availability of Play Services and if there is any
  * registration ID defined it perform the registration request.
- * <p/>
  * In order to fully exploit the GCM service you should follow the initial setup like explained
  * in <a href="http://developer.android.com/google/gcm/gcm.html">GCM</a>.
- * <p/>
  * You need to extends two abstract classes:
  * <ol>
  * <li>
@@ -41,7 +38,6 @@ import android.util.Log;
  * operations to be performed when a GCM message is received
  * </li>
  * </ol>
- * <p/>
  * Modify the build.gradle file adding your
  * AndroidManifest requirements:
  * <ol>
@@ -51,7 +47,7 @@ import android.util.Log;
  * <li>
  * Custom permission: only this app can receive its messages
  * <pre>
- *             {code <permission android:name="PACKAGE_NAME.permission.C2D_MESSAGE"
+ *             {@code <permission android:name="PACKAGE_NAME.permission.C2D_MESSAGE"
  *                      android:protectionLevel="signature" />}
  *         </pre>
  * where PACKAGE_NAME is the package of your application (attribute of the manifest file)

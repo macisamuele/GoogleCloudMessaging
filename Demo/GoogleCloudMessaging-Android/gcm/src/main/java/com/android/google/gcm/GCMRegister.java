@@ -51,9 +51,9 @@ public class GCMRegister {
 
     /**
      * Gets the current registration ID for application on GCM service, if there is one.
-     * <p/>
      * If result is empty, the app needs to register.
      *
+     * @param context application's context
      * @return registration ID, or empty string if there is no existing registration ID.
      */
     public static String getRegistrationId(Context context) {
@@ -77,9 +77,12 @@ public class GCMRegister {
 
     /**
      * Registers the application with GCM servers asynchronously.
-     * <p/>
      * Stores the registration ID and the app versionCode in the application's
      * shared preferences.
+     *
+     * @param context application's context
+     * @param senderID project number assigned to your project from Google platform
+     * @param onRegisterCallback callback to allow code execution after the registration ({@code null} to execute nothing)
      */
     public static void register(@NonNull final Context context, @NonNull final String senderID, final OnRegisterCallback onRegisterCallback) {
         new AsyncTask<Void, Void, Void>() {
@@ -103,9 +106,11 @@ public class GCMRegister {
 
     /**
      * Unregisters the application from GCM servers asynchronously.
-     * <p/>
      * Delete the stored registration ID and the app versionCode from
      * the application's shared preferences.
+     *
+     * @param context application's context
+     * @param onUnregisterCallback callback to allow code execution after the un-registration ({@code null} to execute nothing)
      */
     public static void unregister(@NonNull final Context context, final OnUnregisterCallback onUnregisterCallback) {
         new AsyncTask<Void, Void, Void>() {
@@ -141,7 +146,7 @@ public class GCMRegister {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(PROPERTY_REG_ID, regId);
         editor.putInt(PROPERTY_APP_VERSION, appVersion);
-        editor.commit();
+        editor.apply();
     }
 
     /**
@@ -155,10 +160,11 @@ public class GCMRegister {
         SharedPreferences.Editor editor = prefs.edit();
         editor.remove(PROPERTY_REG_ID);
         editor.remove(PROPERTY_APP_VERSION);
-        editor.commit();
+        editor.apply();
     }
 
     /**
+     * @param context application's context.
      * @return Application's version code from the {@code PackageManager}.
      */
     private static int getAppVersion(Context context) {
