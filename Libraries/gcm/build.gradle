@@ -9,9 +9,10 @@ android {
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
+
         //SENDER_ID_GCM represent the project number of your project on the google developers console
         //https://console.developers.google.com/project/your-project-name
-        buildConfigField "String", "SENDER_ID_GCM", "\"PROJECT-NUMBER\""
+        buildConfigField "String", "SENDER_ID_GCM", "\"117389042641\""
     }
     buildTypes {
         release {
@@ -24,5 +25,11 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.google.android.gms:play-services:7.0.0'
+    //better to use 'com.google.android.gms:play-services-gcm:7.0.0' but in debugging phase on
+    //android emulator the version 7.0.0 cannot be used since is not installed the right version
+    //of Play service. With this should work.
+    compile 'com.google.android.gms:play-services:6.5.87'
+    //should be used instead of the 'com.google.android.gms:play-services:6.5.87' since it uses
+    //the new version of the library and adds only the relevant code for the GCM service
+    //compile 'com.google.android.gms:play-services-gcm:7.0.0'
 }

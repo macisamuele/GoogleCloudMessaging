@@ -23,69 +23,69 @@ import android.util.Log;
 /**
  * An Application wrapper that perform the required operations to initialize the device with
  * the GoogleCloudMessaging infrastructure.
- *
+ * <p/>
  * It automatically checks the availability of Play Services and if there is any
  * registration ID defined it perform the registration request.
- *
+ * <p/>
  * In order to fully exploit the GCM service you should follow the initial setup like explained
  * in <a href="http://developer.android.com/google/gcm/gcm.html">GCM</a>.
- *
+ * <p/>
  * You need to extends two abstract classes:
  * <ol>
- *     <li>
- *         {@link GCMBaseBroadcastReceiver}: receives the
- *         broadcast messages and forward them to the {@code IntentService} class
- *     </li>
- *     <li>
- *         {@link GCMBaseIntentService}: that defines the
- *         operations to be performed when a GCM message is received
- *     </li>
+ * <li>
+ * {@link GCMBaseBroadcastReceiver}: receives the
+ * broadcast messages and forward them to the {@code IntentService} class
+ * </li>
+ * <li>
+ * {@link GCMBaseIntentService}: that defines the
+ * operations to be performed when a GCM message is received
+ * </li>
  * </ol>
- *
+ * <p/>
  * Modify the build.gradle file adding your
  * AndroidManifest requirements:
  * <ol>
- *     <li>
- *         {@code minSdkVersion} should be greater than 8 (for GooglePlay Services)
- *     </li>
- *     <li>
- *         Custom permission: only this app can receive its messages
- *         <pre>
+ * <li>
+ * {@code minSdkVersion} should be greater than 8 (for GooglePlay Services)
+ * </li>
+ * <li>
+ * Custom permission: only this app can receive its messages
+ * <pre>
  *             {code <permission android:name="PACKAGE_NAME.permission.C2D_MESSAGE"
  *                      android:protectionLevel="signature" />}
  *         </pre>
- *         where PACKAGE_NAME is the package of your application (attribute of the manifest file)
- *     </li>
- *     <li>
- *         Permissions:
- *         <ol>
- *             <li>
- *                 {@code android.permission.INTERNET} to allow connection to Google Services
- *             </li>
- *             <li>
- *                 {@code android.permission.GET_ACCOUNTS} since is required a Google account
- *             </li>
- *             <li>
- *                 {@code android.permission.WAKE_LOCK} Keeps the processor from sleeping when a message is received.
- *             </li>
- *             <li>
- *                 {@code com.google.android.c2dm.permission.RECEIVE} to allow to register and receive data messages
- *             </li>
- *             <li>
- *                 {@code PACKAGE_NAME.permission.C2D_MESSAGE} to allow the receiving of messages
- *             </li>
- *         </ol>
- *     </li>
- *     <li>
- *         Meta-Data into application tag
- *         <pre>
+ * where PACKAGE_NAME is the package of your application (attribute of the manifest file)
+ * </li>
+ * <li>
+ * Permissions:
+ * <ol>
+ * <li>
+ * {@code android.permission.INTERNET} to allow connection to Google Services
+ * </li>
+ * <li>
+ * {@code android.permission.GET_ACCOUNTS} since is required a Google account
+ * </li>
+ * <li>
+ * {@code android.permission.WAKE_LOCK} Keeps the processor from sleeping when a message is received.
+ * </li>
+ * <li>
+ * {@code com.google.android.c2dm.permission.RECEIVE} to allow to register and receive data messages
+ * </li>
+ * <li>
+ * {@code PACKAGE_NAME.permission.C2D_MESSAGE} to allow the receiving of messages
+ * </li>
+ * </ol>
+ * </li>
+ * <li>
+ * Meta-Data into application tag
+ * <pre>
  *             {@code <meta-data android:name="com.google.android.gms.version"
  *                  android:value="@integer/google_play_services_version" />}
  *         </pre>
- *     </li>
- *     <li>
- *         Receiver tag
- *         <pre>
+ * </li>
+ * <li>
+ * Receiver tag
+ * <pre>
  *              {@code <receiver android:name="BROADCAST_RECEIVER_CLASS"
  *                  android:permission="com.google.android.c2dm.permission.SEND">
  *                          <intent-filter>
@@ -94,14 +94,14 @@ import android.util.Log;
  *                          </intent-filter>
  *                      </receiver>}
  *         </pre>
- *         where BROADCAST_RECEIVER_CLASS is the extended class of {@code GCMBaseBroadcastReceiver}
- *         and PACKAGE_NAME is the package of your application (attribute of the manifest file)
- *     </li>
- *     <li>
- *         Service tag
- *         {@code <service android:name="INTENT_SERVICE_CLASS" />}
- *         where INTENT_SERVICE_CLASS is the extended class of {@code GCMBaseIntentService}
- *     </li>
+ * where BROADCAST_RECEIVER_CLASS is the extended class of {@code GCMBaseBroadcastReceiver}
+ * and PACKAGE_NAME is the package of your application (attribute of the manifest file)
+ * </li>
+ * <li>
+ * Service tag
+ * {@code <service android:name="INTENT_SERVICE_CLASS" />}
+ * where INTENT_SERVICE_CLASS is the extended class of {@code GCMBaseIntentService}
+ * </li>
  * </ol>
  */
 /* Manifest skeleton
@@ -140,58 +140,73 @@ public class GCMReadyApplication extends Application {
     private static final String TAG = GCMReadyApplication.class.getSimpleName();
 
     public GCMReadyApplication() {
-        registerActivityLifecycleCallbacks(acttivityLifeCicleCallback);
+        registerActivityLifecycleCallbacks(getActivityLifecycleCallback(forceGooglePlayServices()));
     }
 
-    private final ActivityLifecycleCallbacks acttivityLifeCicleCallback = new ActivityLifecycleCallbacks() {
-        @Override
-        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
-            // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
-            if (GooglePlayServiceUtils.checkPlayServices(activity)) {
-                String regid = GCMRegister.getRegistrationId(getApplicationContext());
-                Log.d(TAG, regid);
-                if (regid.isEmpty()) {
-                    GCMRegister.register(getApplicationContext(), BuildConfig.SENDER_ID_GCM, new GCMRegister.OnRegisterCallback() {
-                        @Override
-                        public void onRegister(String registrationID) {
-                            GCMReadyApplication.this.onRegister(registrationID);
-                        }
-                    });
+    /**
+     * Define if the Android application must have the correct version of Google Play Services and so show the
+     * error dialog if there is a recoverable error
+     * Override this method to change the behaviour (useful during testing phase)
+     *
+     * @return true if should be shown the error dialog if necessary
+     */
+    public boolean forceGooglePlayServices() {
+        return true;
+    }
+
+    private final ActivityLifecycleCallbacks getActivityLifecycleCallback(final boolean forceGooglePlayServices) {
+        return new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+                // Check device for Play Services APK. If check succeeds, proceed with GCM registration.
+                if (GooglePlayServiceUtils.checkPlayServices(activity, forceGooglePlayServices)) {
+                    String regid = GCMRegister.getRegistrationId(getApplicationContext());
+                    Log.d(TAG, regid);
+                    if (regid.isEmpty()) {
+                        GCMRegister.register(getApplicationContext(), BuildConfig.SENDER_ID_GCM, new GCMRegister.OnRegisterCallback() {
+                            @Override
+                            public void onRegister(String registrationID) {
+                                GCMReadyApplication.this.onRegister(registrationID);
+                            }
+                        });
+                    }
+                } else {
+                    Log.i(TAG, "No valid Google Play Services APK found.");
                 }
-            } else {
-                Log.i(TAG, "No valid Google Play Services APK found.");
             }
-        }
 
-        @Override
-        public void onActivityStarted(Activity activity) {
-        }
+            @Override
+            public void onActivityStarted(Activity activity) {
+            }
 
-        @Override
-        public void onActivityResumed(Activity activity) {
-            GooglePlayServiceUtils.checkPlayServices(activity);
-        }
+            @Override
+            public void onActivityResumed(Activity activity) {
+                GooglePlayServiceUtils.checkPlayServices(activity, false);
+            }
 
-        @Override
-        public void onActivityPaused(Activity activity) {
-        }
+            @Override
+            public void onActivityPaused(Activity activity) {
+            }
 
-        @Override
-        public void onActivityStopped(Activity activity) {
-        }
+            @Override
+            public void onActivityStopped(Activity activity) {
+            }
 
-        @Override
-        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
-        }
+            @Override
+            public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+            }
 
-        @Override
-        public void onActivityDestroyed(Activity activity) {
-        }
-    };
+            @Override
+            public void onActivityDestroyed(Activity activity) {
+            }
+        };
+    }
 
     /**
      * Perform the required operations after the successiful registration of the device
+     *
      * @param registrationID registration ID assigned from the Google Platform
      */
-    public void onRegister(String registrationID) {}
+    public void onRegister(String registrationID) {
+    }
 }
